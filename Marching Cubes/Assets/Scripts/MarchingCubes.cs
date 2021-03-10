@@ -1,5 +1,7 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.PackageManager;
 using UnityEngine;
 
 public static class MarchingCubes
@@ -49,6 +51,19 @@ public static class MarchingCubes
             vertex += 4;
         }
         return vertex;
+    }
+
+    public static int lookupEdge(int v1, int v2)
+    {
+        // vertices in ascending order
+        if (v1 > v2) return lookupEdge(v2, v1);
+
+        // XY plane
+        if (v2 == v1 + 1) return v1;
+        if (v2 == v1 + 3) return v2;
+        // Z
+        if (v2 == v1 + 4) return v1 + 8;
+        throw new ArgumentException($"There is no edge between vertex:{v1} and vertex:{v2}");
     }
 
     // Taken from http://paulbourke.net/geometry/polygonise/
