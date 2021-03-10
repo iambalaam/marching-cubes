@@ -1,9 +1,39 @@
 ﻿using NUnit.Framework;
 using System;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 namespace Tests
 {
+    public class CubeTests
+    {
+        MarchingCubes.ScalarField constant = v => 1;
+        MarchingCubes.ScalarField evenOdd = v => (v.x + v.y + v.z) % 2;
+
+        [Test]
+        public void CubePopulatesVertices()
+        {
+            var cube = new MarchingCubes.Cube(Vector3.zero, evenOdd);
+            Assert.AreEqual(0, cube.values[0]);
+            Assert.AreEqual(1, cube.values[1]);
+            Assert.AreEqual(0, cube.values[2]);
+            Assert.AreEqual(1, cube.values[3]);
+            Assert.AreEqual(1, cube.values[4]);
+            Assert.AreEqual(0, cube.values[5]);
+            Assert.AreEqual(1, cube.values[6]);
+            Assert.AreEqual(0, cube.values[7]);
+        }
+        [Test]
+        public void CubePopulatesConstantValues()
+        {
+            var cube = new MarchingCubes.Cube(Vector3.zero, constant);
+            foreach (float value in cube.values)
+            {
+                Assert.AreEqual(1, value);
+            }
+        }
+    }
+
     public class MarchingCubesTests
     {
         [Test]

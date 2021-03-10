@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEditor.PackageManager;
 using UnityEngine;
 
 public static class MarchingCubes
@@ -23,12 +20,44 @@ public static class MarchingCubes
      *      |.'           | .'
      *      3------2------2' 
      *    (y)
-     */   
+     */
 
     public delegate float ScalarField(Vector3 v);
+    public class Cube
+    {
+        public float[] values = new float[8];
+        public Vector3[] vertices = new Vector3[8];
+        public Cube(Vector3 v, ScalarField s)
+        {
+            vertices[0] = v;
+            vertices[1] = v + new Vector3(1, 0, 0);
+            vertices[2] = v + new Vector3(1, 1, 0);
+            vertices[3] = v + new Vector3(0, 1, 0);
+            vertices[4] = v + new Vector3(0, 0, 1);
+            vertices[5] = v + new Vector3(1, 0, 1);
+            vertices[6] = v + new Vector3(1, 1, 1);
+            vertices[7] = v + new Vector3(0, 1, 1);
+
+            for (int i = 0; i < 8; i++)
+            {
+                values[i] = s(vertices[i]);
+            }
+        }
+    }
+
     public static void Triangulate(Vector3 v, ScalarField s)
     {
-
+        // Find which vertices on the cube lie outside the surface of s(v)=0
+        int lookupIndex = 0;
+        Cube cube = new Cube(v, s);
+        for (int i = 0; i < 8; i++)
+        {
+            if (cube.values[i] > 0)
+            {
+                lookupIndex += 1 << i;
+            }
+        }
+        int[] triangulation = lookupTable[lookupIndex];
     }
 
     public static int lookupVertex(Vector3Int v)
@@ -46,7 +75,7 @@ public static class MarchingCubes
         {
             vertex += 3;
         }
-        if (v.z ==1)
+        if (v.z == 1)
         {
             vertex += 4;
         }
