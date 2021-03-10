@@ -105,39 +105,39 @@ namespace Tests
              *    (y)
              */
             // Bottom plane
-            Assert.AreEqual(0, MarchingCubes.lookupEdge(0, 1));
-            Assert.AreEqual(0, MarchingCubes.lookupEdge(1, 0));
-            Assert.AreEqual(1, MarchingCubes.lookupEdge(1, 2));
-            Assert.AreEqual(1, MarchingCubes.lookupEdge(2, 1));
-            Assert.AreEqual(2, MarchingCubes.lookupEdge(2, 3));
-            Assert.AreEqual(2, MarchingCubes.lookupEdge(3, 2));
-            Assert.AreEqual(3, MarchingCubes.lookupEdge(3, 0));
-            Assert.AreEqual(3, MarchingCubes.lookupEdge(0, 3));
+            Assert.AreEqual(0, MarchingCubes.Vertices2Edge(0, 1));
+            Assert.AreEqual(0, MarchingCubes.Vertices2Edge(1, 0));
+            Assert.AreEqual(1, MarchingCubes.Vertices2Edge(1, 2));
+            Assert.AreEqual(1, MarchingCubes.Vertices2Edge(2, 1));
+            Assert.AreEqual(2, MarchingCubes.Vertices2Edge(2, 3));
+            Assert.AreEqual(2, MarchingCubes.Vertices2Edge(3, 2));
+            Assert.AreEqual(3, MarchingCubes.Vertices2Edge(3, 0));
+            Assert.AreEqual(3, MarchingCubes.Vertices2Edge(0, 3));
             // Top plane
-            Assert.AreEqual(4, MarchingCubes.lookupEdge(4, 5));
-            Assert.AreEqual(4, MarchingCubes.lookupEdge(5, 4));
-            Assert.AreEqual(5, MarchingCubes.lookupEdge(5, 6));
-            Assert.AreEqual(5, MarchingCubes.lookupEdge(6, 5));
-            Assert.AreEqual(6, MarchingCubes.lookupEdge(6, 7));
-            Assert.AreEqual(6, MarchingCubes.lookupEdge(7, 6));
-            Assert.AreEqual(7, MarchingCubes.lookupEdge(7, 8));
-            Assert.AreEqual(7, MarchingCubes.lookupEdge(8, 7));
+            Assert.AreEqual(4, MarchingCubes.Vertices2Edge(4, 5));
+            Assert.AreEqual(4, MarchingCubes.Vertices2Edge(5, 4));
+            Assert.AreEqual(5, MarchingCubes.Vertices2Edge(5, 6));
+            Assert.AreEqual(5, MarchingCubes.Vertices2Edge(6, 5));
+            Assert.AreEqual(6, MarchingCubes.Vertices2Edge(6, 7));
+            Assert.AreEqual(6, MarchingCubes.Vertices2Edge(7, 6));
+            Assert.AreEqual(7, MarchingCubes.Vertices2Edge(7, 8));
+            Assert.AreEqual(7, MarchingCubes.Vertices2Edge(8, 7));
             // Verticals
-            Assert.AreEqual(8, MarchingCubes.lookupEdge(0, 4));
-            Assert.AreEqual(8, MarchingCubes.lookupEdge(4, 0));
-            Assert.AreEqual(9, MarchingCubes.lookupEdge(1, 5));
-            Assert.AreEqual(9, MarchingCubes.lookupEdge(5, 1));
-            Assert.AreEqual(10, MarchingCubes.lookupEdge(2, 6));
-            Assert.AreEqual(10, MarchingCubes.lookupEdge(6, 2));
-            Assert.AreEqual(11, MarchingCubes.lookupEdge(3, 7));
-            Assert.AreEqual(11, MarchingCubes.lookupEdge(7, 3));
+            Assert.AreEqual(8, MarchingCubes.Vertices2Edge(0, 4));
+            Assert.AreEqual(8, MarchingCubes.Vertices2Edge(4, 0));
+            Assert.AreEqual(9, MarchingCubes.Vertices2Edge(1, 5));
+            Assert.AreEqual(9, MarchingCubes.Vertices2Edge(5, 1));
+            Assert.AreEqual(10, MarchingCubes.Vertices2Edge(2, 6));
+            Assert.AreEqual(10, MarchingCubes.Vertices2Edge(6, 2));
+            Assert.AreEqual(11, MarchingCubes.Vertices2Edge(3, 7));
+            Assert.AreEqual(11, MarchingCubes.Vertices2Edge(7, 3));
         }
         [Test]
         public void MissingEdgeLookup()
         {
             try
             {
-                MarchingCubes.lookupEdge(0, 5);
+                MarchingCubes.Vertices2Edge(0, 5);
             }
             catch (ArgumentException e)
             {

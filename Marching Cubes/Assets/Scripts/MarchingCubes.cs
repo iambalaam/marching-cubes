@@ -45,19 +45,30 @@ public static class MarchingCubes
         }
     }
 
-    public static void Triangulate(Vector3 v, ScalarField s)
+    public static Vector3[] TriangulateCube(Vector3 v, ScalarField s)
     {
         // Find which vertices on the cube lie outside the surface of s(v)=0
         int lookupIndex = 0;
         Cube cube = new Cube(v, s);
         for (int i = 0; i < 8; i++)
         {
-            if (cube.values[i] > 0)
+            if (cube.values[i] < 0)
             {
                 lookupIndex += 1 << i;
             }
         }
         int[] triangulation = lookupTable[lookupIndex];
+
+        Vector3[] triangleVertices = new Vector3[triangulation.Length];
+        for (int i = 0; i < triangulation.Length; i++)
+        {
+            int[] edgeVertices = edge2Verticies[triangulation[i]];
+            Vector3 midpoint = (cube.vertices[edgeVertices[0]] + cube.vertices[edgeVertices[1]]) / 2f;
+            triangleVertices[i] = midpoint;
+        }
+        return triangleVertices;
+
+
     }
 
     public static int lookupVertex(Vector3Int v)
@@ -82,10 +93,10 @@ public static class MarchingCubes
         return vertex;
     }
 
-    public static int lookupEdge(int v1, int v2)
+    public static int Vertices2Edge(int v1, int v2)
     {
         // vertices in ascending order
-        if (v1 > v2) return lookupEdge(v2, v1);
+        if (v1 > v2) return Vertices2Edge(v2, v1);
 
         // XY plane
         if (v2 == v1 + 1) return v1;
@@ -94,6 +105,21 @@ public static class MarchingCubes
         if (v2 == v1 + 4) return v1 + 8;
         throw new ArgumentException($"There is no edge between vertex:{v1} and vertex:{v2}");
     }
+
+    public static int[][] edge2Verticies = {
+            new int[] { 0, 1 },
+            new int[] { 1, 2 },
+            new int[] { 2, 3 },
+            new int[] { 3, 0 },
+            new int[] { 4, 5 },
+            new int[] { 5, 6 },
+            new int[] { 6, 7 },
+            new int[] { 7, 4 },
+            new int[] { 0, 4 },
+            new int[] { 1, 5 },
+            new int[] { 2, 6 },
+            new int[] { 3, 7 }
+    };
 
     // Taken from http://paulbourke.net/geometry/polygonise/
     public static int[][] lookupTable =
