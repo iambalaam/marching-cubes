@@ -2,8 +2,56 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public static class Triangulation
+public static class MarchingCubes
 {
+    /*
+     * Representation of cube
+     *             (z)
+     *             .4------4------5
+     *           .' |           .'|
+     *         .7   8         .5  |
+     *       .'     |       .'    |
+     *      7-------+-6---6'      9
+     *      |       |     |       |
+     *      |       |     10      |
+     *      11      |     |       |
+     *      |      .0-----+-0-----1 (x)
+     *      |    .'       |     .'
+     *      |  .3         |   .1
+     *      |.'           | .'
+     *      3------2------2' 
+     *    (y)
+     */   
+
+    public delegate float ScalarField(Vector3 v);
+    public static void Triangulate(Vector3 v, ScalarField s)
+    {
+
+    }
+
+    public static int lookupVertex(Vector3Int v)
+    {
+        int vertex = 0;
+        if (v.x == 1 && v.y == 0)
+        {
+            vertex += 1;
+        }
+        if (v.x == 1 && v.y == 1)
+        {
+            vertex += 2;
+        }
+        if (v.x == 0 && v.y == 1)
+        {
+            vertex += 3;
+        }
+        if (v.z ==1)
+        {
+            vertex += 4;
+        }
+        return vertex;
+    }
+
+    // Taken from http://paulbourke.net/geometry/polygonise/
     public static int[][] lookupTable =
     {
         new int[] {},
