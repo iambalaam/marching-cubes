@@ -57,18 +57,22 @@ public static class MarchingCubes
                 lookupIndex += 1 << i;
             }
         }
+
+        // Lookup which triangulation this corresponds to
         int[] triangulation = lookupTable[lookupIndex];
 
+        // Interpolate worldspace coordinates for triangulation
         Vector3[] triangleVertices = new Vector3[triangulation.Length];
         for (int i = 0; i < triangulation.Length; i++)
         {
-            int[] edgeVertices = edge2Verticies[triangulation[i]];
-            Vector3 midpoint = (cube.vertices[edgeVertices[0]] + cube.vertices[edgeVertices[1]]) / 2f;
-            triangleVertices[i] = midpoint;
+            int v0 = edge2Vertices[triangulation[i]][0];
+            int v1 = edge2Vertices[triangulation[i]][1];
+
+            float totalChange = cube.values[v1] - cube.values[v0];
+            Vector3 weightedAvg = ((cube.values[v0] * cube.vertices[v1]) - (cube.values[v1] * cube.vertices[v0])) / totalChange;
+            triangleVertices[i] = weightedAvg;
         }
         return triangleVertices;
-
-
     }
 
     public static int lookupVertex(Vector3Int v)
@@ -106,7 +110,7 @@ public static class MarchingCubes
         throw new ArgumentException($"There is no edge between vertex:{v1} and vertex:{v2}");
     }
 
-    public static int[][] edge2Verticies = {
+    public static int[][] edge2Vertices = {
             new int[] { 0, 1 },
             new int[] { 1, 2 },
             new int[] { 2, 3 },

@@ -12,17 +12,22 @@ public class MeshGenerator : MonoBehaviour
 
     Mesh mesh;
 
-    void Update()
+    private void Start()
     {
         mesh = new Mesh();
         GetComponent<MeshFilter>().mesh = mesh;
+    }
 
-        Vector3Int mapSize = new Vector3Int(20, 20, 20);
+    void Update()
+    {
+        zOffset += Time.deltaTime;
+
+        Vector3Int mapSize = new Vector3Int(15, 15, 15);
 
         MarchingCubes.ScalarField field = (Vector3 v) => {
             v.z += zOffset;
             float floor = (8 - v.y) * 0.1f;
-            float noise = Noise.Sample(v / 20f);
+            float noise = Noise.Sample(v / 10f);
             return floor + noise;
         };
 
@@ -43,6 +48,7 @@ public class MeshGenerator : MonoBehaviour
 
         int[] triangles = Enumerable.Range(0, vertices.Count).ToArray();
 
+        mesh.Clear();
         mesh.vertices = vertices.ToArray();
         mesh.triangles = triangles;
         mesh.RecalculateNormals();
