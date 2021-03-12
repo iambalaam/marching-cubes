@@ -6,17 +6,22 @@ using UnityEngine;
 [RequireComponent(typeof(MeshFilter))]
 public class MeshGenerator : MonoBehaviour
 {
+    // Unity connected
+    [Range(0, 100)]
+    public float zOffset = 0;
+
     Mesh mesh;
 
-    void Start()
+    void Update()
     {
         mesh = new Mesh();
         GetComponent<MeshFilter>().mesh = mesh;
 
-        Vector3Int mapSize = new Vector3Int(120, 30, 120);
+        Vector3Int mapSize = new Vector3Int(20, 20, 20);
 
         MarchingCubes.ScalarField field = (Vector3 v) => {
-            float floor = (10 - v.y) * 0.1f;
+            v.z += zOffset;
+            float floor = (8 - v.y) * 0.1f;
             float noise = Noise.Sample(v / 20f);
             return floor + noise;
         };
