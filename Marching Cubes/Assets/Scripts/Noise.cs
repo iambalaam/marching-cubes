@@ -14,10 +14,10 @@ public static class Noise
         float xy = _perlin3DFixed(x, y);
         float xz = _perlin3DFixed(x, z);
         float yz = _perlin3DFixed(y, z);
-        float yx = _perlin3DFixed(y, x);
-        float zx = _perlin3DFixed(z, x);
-        float zy = _perlin3DFixed(z, y);
-        return xy * xz * yz * yx * zx * zy;
+        // float yx = _perlin3DFixed(y, x);
+        // float zx = _perlin3DFixed(z, x);
+        // float zy = _perlin3DFixed(z, y);
+        return xy * xz * yz; // * yx * zx * zy;
     }
     static private float _perlin3DFixed(float a, float b)
     {
