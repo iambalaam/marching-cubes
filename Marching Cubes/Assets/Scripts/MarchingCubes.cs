@@ -69,7 +69,7 @@ public static class MarchingCubes
             int v1 = edge2Vertices[triangulation[i]][1];
 
             float totalChange = cube.values[v1] - cube.values[v0];
-            Vector3 weightedAvg = ((cube.values[v0] * cube.vertices[v1]) - (cube.values[v1] * cube.vertices[v0])) / totalChange;
+            Vector3 weightedAvg = ((cube.values[v1] * cube.vertices[v0]) - (cube.values[v0] * cube.vertices[v1])) / totalChange;
             triangleVertices[i] = weightedAvg;
         }
         return triangleVertices;

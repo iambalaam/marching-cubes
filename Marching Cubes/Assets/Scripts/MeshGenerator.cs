@@ -6,40 +6,27 @@ using UnityEngine;
 [RequireComponent(typeof(MeshFilter))]
 public class MeshGenerator : MonoBehaviour
 {
-    // Unity connected
-    [Range(-2, 2)]
-    public float sOffset = 0;
-    
-    private float zOffset = 0;
+    private static Vector3Int mapSize = new Vector3Int(50, 10, 50);
 
     Mesh mesh;
 
-    private void Start()
+    MarchingCubes.ScalarField field = (Vector3 v) => {
+        // Adding nice edges to the map
+        if (v.x == 0 || v.x == mapSize.x) return -0.01f;
+        if (v.z == 0 || v.z == mapSize.z) return -0.01f;
+        float heightBias = (1 - v.y) * 0.12f;
+        float noise = Noise.Sample(v / 10f);
+        return heightBias + noise;
+    };
+
+    void OnDrawGizmos()
     {
-        mesh = new Mesh();
-        GetComponent<MeshFilter>().mesh = mesh;
+        Gizmos.color = Color.white;
+        Gizmos.DrawWireCube(transform.position + ((Vector3)mapSize / 2f), mapSize);
     }
 
-    void Update()
+    private void GenerateMesh()
     {
-        zOffset += Time.deltaTime;
-
-        Vector3Int mapSize = new Vector3Int(30, 15, 30);
-
-        MarchingCubes.ScalarField field = (Vector3 v) => {
-            // Hard floor
-            if (v.y == 15) return -0.01f;
-            // Adding nice edges to the map
-            if (v.x == 0 || v.x == mapSize.x -1) return 0.01f;
-            if (v.z == 0 || v.z == mapSize.z -1) return 0.01f;
-
-            v.z += zOffset;
-            float heightBias = (8 - v.y) * 0.12f;
-            float noise = Noise.Sample(v / 10f);
-            return heightBias + noise + sOffset;
-        };
-
-
         List<Vector3> vertices = new List<Vector3>();
 
         for (int x = 0; x < mapSize.x; x++)
@@ -48,8 +35,8 @@ public class MeshGenerator : MonoBehaviour
             {
                 for (int z = 0; z < mapSize.z; z++)
                 {
-                    vertices.AddRange(MarchingCubes.TriangulateCube(new Vector3(x, y, z), field));
-
+                    Vector3[] tris = MarchingCubes.TriangulateCube(new Vector3(x, y, z), field);
+                    vertices.AddRange(tris);
                 }
             }
         }
@@ -59,14 +46,22 @@ public class MeshGenerator : MonoBehaviour
 
         for (int i = 0; i < vertices.Count; i++)
         {
-            colors[i] = Color.Lerp(Color.blue, Color.red, (vertices[i].y / 5f) + 3f);
+            colors[i] = Color.Lerp(Color.blue, Color.red, (vertices[i].y / 10f));
         }
 
-        mesh.Clear();
+
         mesh.vertices = vertices.ToArray();
         mesh.colors = colors;
         mesh.triangles = triangles;
         mesh.RecalculateNormals();
+    }
+
+    private void Start()
+    {
+        mesh = new Mesh();
+        GetComponent<MeshFilter>().mesh = mesh;
+
+        GenerateMesh();
 
     }
 
