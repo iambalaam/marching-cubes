@@ -4,22 +4,31 @@ using System.Linq;
 using UnityEngine;
 
 [RequireComponent(typeof(MeshFilter))]
+[RequireComponent(typeof(MeshRenderer))]
+[ExecuteAlways]
 public class MeshGenerator : MonoBehaviour
 {
     private static Vector3Int mapSize = new Vector3Int(50, 10, 50);
 
     Mesh mesh;
 
+    private void Start()
+    {
+        mesh = new Mesh();
+        GetComponent<MeshFilter>().mesh = mesh;
+        GetComponent<MeshRenderer>().material = GetComponentInParent<MeshRenderer>().sharedMaterial;
+        Debug.Log(GetComponentInParent<MeshRenderer>().sharedMaterial);
+
+        GenerateMesh();
+    }
+
     MarchingCubes.ScalarField field = (Vector3 v) => {
-        // Adding nice edges to the map
-        if (v.x == 0 || v.x == mapSize.x) return -0.01f;
-        if (v.z == 0 || v.z == mapSize.z) return -0.01f;
         float heightBias = (1 - v.y) * 0.12f;
         float noise = Noise.Sample(v / 10f);
         return heightBias + noise;
     };
 
-    void OnDrawGizmos()
+    void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.white;
         Gizmos.DrawWireCube(transform.position + ((Vector3)mapSize / 2f), mapSize);
@@ -35,7 +44,7 @@ public class MeshGenerator : MonoBehaviour
             {
                 for (int z = 0; z < mapSize.z; z++)
                 {
-                    Vector3[] tris = MarchingCubes.TriangulateCube(new Vector3(x, y, z), field);
+                    Vector3[] tris = MarchingCubes.TriangulateCube(new Vector3(x, y, z), (v) => field(v + transform.position));
                     vertices.AddRange(tris);
                 }
             }
@@ -54,15 +63,6 @@ public class MeshGenerator : MonoBehaviour
         mesh.colors = colors;
         mesh.triangles = triangles;
         mesh.RecalculateNormals();
-    }
-
-    private void Start()
-    {
-        mesh = new Mesh();
-        GetComponent<MeshFilter>().mesh = mesh;
-
-        GenerateMesh();
-
     }
 
 }
