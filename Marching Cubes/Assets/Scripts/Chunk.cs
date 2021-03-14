@@ -1,14 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
 [RequireComponent(typeof(MeshFilter))]
 [RequireComponent(typeof(MeshRenderer))]
 [ExecuteAlways]
-public class MeshGenerator : MonoBehaviour
+public class Chunk : MonoBehaviour
 {
-    private static Vector3Int mapSize = new Vector3Int(50, 10, 50);
+    private static Vector3Int chunkSize = new Vector3Int(50, 10, 50);
+    private static float gridSize = 1f;
 
     Mesh mesh;
 
@@ -31,18 +31,18 @@ public class MeshGenerator : MonoBehaviour
     void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.white;
-        Gizmos.DrawWireCube(transform.position + ((Vector3)mapSize / 2f), mapSize);
+        Gizmos.DrawWireCube(transform.position + ((Vector3)chunkSize / 2f), chunkSize);
     }
 
     private void GenerateMesh()
     {
         List<Vector3> vertices = new List<Vector3>();
 
-        for (int x = 0; x < mapSize.x; x++)
+        for (float x = 0; x < chunkSize.x; x += gridSize)
         {
-            for (int y = 0; y < mapSize.y; y++)
+            for (float y = 0; y < chunkSize.y; y += gridSize)
             {
-                for (int z = 0; z < mapSize.z; z++)
+                for (float z = 0; z < chunkSize.z; z += gridSize)
                 {
                     Vector3[] tris = MarchingCubes.TriangulateCube(new Vector3(x, y, z), (v) => field(v + transform.position));
                     vertices.AddRange(tris);

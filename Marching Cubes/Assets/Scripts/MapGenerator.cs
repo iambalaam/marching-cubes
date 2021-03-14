@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 
-[ExecuteAlways]
 public class MapGenerator : MonoBehaviour
 {
     // Unity connected
@@ -12,10 +11,11 @@ public class MapGenerator : MonoBehaviour
         {
             for (int z = 0; z < 100; z+=50)
             {
-                GameObject meshGen = new GameObject();
-                meshGen.transform.position = new Vector3(x, 0, z);
-                meshGen.AddComponent<MeshGenerator>();
-                meshGen.GetComponent<MeshRenderer>().material = material;
+                GameObject chunk = new GameObject($"Chunk {x},{z}");
+                chunk.transform.parent = transform;
+                chunk.transform.position = new Vector3(x, 0, z);
+                chunk.AddComponent<Chunk>();
+                chunk.GetComponent<MeshRenderer>().material = material;
             }
         }
     }
