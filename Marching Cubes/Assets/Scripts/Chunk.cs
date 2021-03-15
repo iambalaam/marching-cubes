@@ -4,11 +4,12 @@ using UnityEngine;
 
 [RequireComponent(typeof(MeshFilter))]
 [RequireComponent(typeof(MeshRenderer))]
+[RequireComponent(typeof(MeshCollider))]
 [ExecuteAlways]
 public class Chunk : MonoBehaviour
 {
-    private static Vector3Int chunkSize = new Vector3Int(50, 10, 50);
-    private static float gridSize = 1f;
+    public static Vector3Int chunkSize = new Vector3Int(50, 10, 50);
+    public float gridSize = 1f;
 
     Mesh mesh;
 
@@ -17,9 +18,8 @@ public class Chunk : MonoBehaviour
         mesh = new Mesh();
         GetComponent<MeshFilter>().mesh = mesh;
         GetComponent<MeshRenderer>().material = GetComponentInParent<MeshRenderer>().sharedMaterial;
-        Debug.Log(GetComponentInParent<MeshRenderer>().sharedMaterial);
-
         GenerateMesh();
+        GetComponent<MeshCollider>().sharedMesh = mesh;
     }
 
     MarchingCubes.ScalarField field = (Vector3 v) => {
