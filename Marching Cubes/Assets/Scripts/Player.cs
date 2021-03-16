@@ -5,7 +5,7 @@ public class Player : MonoBehaviour
     // Looking
     private float MOUSE_SENSITIVITY = 100f;
     private float MOUSE_SMOOTHING = 0.5f;
-    private float xRotation = 90f;
+    private float xRotation = 0f;
     private float yRotation = 0f;
 
     // Moving
