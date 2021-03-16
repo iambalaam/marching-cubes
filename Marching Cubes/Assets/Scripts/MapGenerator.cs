@@ -1,7 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+
 
 public class MapGenerator : MonoBehaviour
 {
@@ -71,14 +71,15 @@ public class MapGenerator : MonoBehaviour
         return chunks;
     }
 
-    private void CreateChunk(Vector3Int chunkIndex)
+    private void CreateChunk(Vector3Int chunkId)
     {
-        GameObject chunk = new GameObject($"Chunk {chunkIndex.x},{chunkIndex.z}");
-        chunks.Add(chunkIndex, chunk);
+        GameObject chunk = new GameObject($"Chunk {chunkId.x},{chunkId.z}");
+        chunks.Add(chunkId, chunk);
         chunk.transform.parent = transform;
-        chunk.transform.position = new Vector3(chunkIndex.x * Chunk.chunkSize.x, 0, chunkIndex.z * Chunk.chunkSize.z);
-        chunk.AddComponent<Chunk>();
-        chunk.GetComponent<MeshRenderer>().material = material;
+        chunk.transform.position = new Vector3(chunkId.x * Chunk.chunkSize.x, 0, chunkId.z * Chunk.chunkSize.z);
+        MeshGenerator meshGen = chunk.AddComponent<MeshGenerator>();
+        chunk.GetComponent<MeshRenderer>().sharedMaterial = material;
+        meshGen.Initialize(chunkId);
     }
 
     private void DestroyChunk(Vector3Int chunkIndex)

@@ -2,40 +2,31 @@
 using System.Linq;
 using UnityEngine;
 
-[RequireComponent(typeof(MeshFilter))]
-[RequireComponent(typeof(MeshRenderer))]
-[RequireComponent(typeof(MeshCollider))]
-[ExecuteAlways]
-public class Chunk : MonoBehaviour
+public class Chunk
 {
+    public struct Data
+    {
+        public Vector3Int chunkId;
+        public Vector3[] vertices;
+        public Color[] colors;
+        public int[] triangles;
+
+        public Data(Vector3Int id) {
+            chunkId = id;
+            vertices = null;
+            colors = null;
+            triangles = null;
+        }
+    }
+
     public static Vector3Int chunkSize = new Vector3Int(50, 10, 50);
-    public float gridSize = 1f;
+    public static float gridSize = 1f;
 
-    Mesh mesh;
-
-    private void Start()
+    public static Data GenerateChunk(Vector3Int chunkId, MarchingCubes.ScalarField s)
     {
-        mesh = new Mesh();
-        GetComponent<MeshFilter>().mesh = mesh;
-        GetComponent<MeshRenderer>().material = GetComponentInParent<MeshRenderer>().sharedMaterial;
-        GenerateMesh();
-        GetComponent<MeshCollider>().sharedMesh = mesh;
-    }
+        Data chunkData = new Data(chunkId);
 
-    MarchingCubes.ScalarField field = (Vector3 v) => {
-        float heightBias = (1 - v.y) * 0.12f;
-        float noise = Noise.Sample(v / 10f);
-        return heightBias + noise;
-    };
-
-    void OnDrawGizmosSelected()
-    {
-        Gizmos.color = Color.white;
-        Gizmos.DrawWireCube(transform.position + ((Vector3)chunkSize / 2f), chunkSize);
-    }
-
-    private void GenerateMesh()
-    {
+        Vector3 origin = new Vector3(chunkId.x * chunkSize.x, chunkId.y * chunkSize.y, chunkId.z * chunkSize.z);
         List<Vector3> vertices = new List<Vector3>();
 
         for (float x = 0; x < chunkSize.x; x += gridSize)
@@ -44,13 +35,13 @@ public class Chunk : MonoBehaviour
             {
                 for (float z = 0; z < chunkSize.z; z += gridSize)
                 {
-                    Vector3[] tris = MarchingCubes.TriangulateCube(new Vector3(x, y, z), (v) => field(v + transform.position));
+                    Vector3[] tris = MarchingCubes.TriangulateCube(new Vector3(x, y, z), (v) => s(origin + v));
                     vertices.AddRange(tris);
                 }
             }
         }
 
-        int[] triangles = Enumerable.Range(0, vertices.Count).ToArray();
+        // Separate this later as another delegate
         Color[] colors = new Color[vertices.Count];
 
         for (int i = 0; i < vertices.Count; i++)
@@ -58,11 +49,11 @@ public class Chunk : MonoBehaviour
             colors[i] = Color.Lerp(Color.blue, Color.red, (vertices[i].y / 10f));
         }
 
+        chunkData.vertices = vertices.ToArray();
+        chunkData.colors = colors;
+        chunkData.triangles = Enumerable.Range(0, vertices.Count).ToArray();
 
-        mesh.vertices = vertices.ToArray();
-        mesh.colors = colors;
-        mesh.triangles = triangles;
-        mesh.RecalculateNormals();
+        return chunkData;
     }
 
 }
