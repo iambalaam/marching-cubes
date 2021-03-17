@@ -61,9 +61,9 @@ public class MapGenerator : MonoBehaviour
     {
         List<Vector3Int> chunks = new List<Vector3Int>();
 
-        for (int x = currentChunk.x - 2; x <= currentChunk.x + 2; x += 1)
+        for (int x = currentChunk.x - 5; x <= currentChunk.x + 5; x += 1)
         {
-            for (int z = currentChunk.z - 2; z <= currentChunk.z + 2; z += 1)
+            for (int z = currentChunk.z - 5; z <= currentChunk.z + 5; z += 1)
             {
                 chunks.Add(new Vector3Int(x, 0, z));
             }

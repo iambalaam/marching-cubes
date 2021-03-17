@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Threading;
 using UnityEngine;
 
@@ -8,9 +9,22 @@ using UnityEngine;
 public class MeshGenerator : MonoBehaviour
 {
     MarchingCubes.ScalarField field = (Vector3 v) => {
-        float heightBias = (1 - v.y) * 0.12f;
-        float noise = Noise.Sample(v / 10f);
-        return heightBias + noise;
+        // Hard floor at 0
+        if (v.y == 0) return 1;
+        if (v.y == Chunk.chunkSize.y) return -1;
+
+        // Soft floor
+        float heightBias = (float) Math.Pow(((Chunk.chunkSize.y / 2) - v.y) / 4, 3) * 0.1f;
+
+        // Noise octaves
+        Vector3 mountains = v / 32;
+        float mountainNoise = Perlin.Noise(mountains.x, mountains.y, mountains.z) * 5;
+        Vector3 bumps = v / 12;
+        float bumpsNoise = Perlin.Noise(bumps.x, bumps.y, bumps.z) * 2;
+        Vector3 roughness = v / 3;
+        float roughNoise = Perlin.Noise(roughness.x, roughness.y, roughness.z);
+
+        return heightBias + mountainNoise + bumpsNoise + roughNoise;
     };
 
     public void Initialize(Vector3Int chunkId)
@@ -22,6 +36,7 @@ public class MeshGenerator : MonoBehaviour
     {
         Mesh mesh = new Mesh();
         GetComponent<MeshFilter>().mesh = mesh;
+
 
         Chunk.Data data = new Chunk.Data(chunkId);
 

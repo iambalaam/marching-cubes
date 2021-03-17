@@ -19,7 +19,7 @@ public class Chunk
         }
     }
 
-    public static Vector3Int chunkSize = new Vector3Int(50, 10, 50);
+    public static Vector3Int chunkSize = new Vector3Int(20, 25, 20);
     public static float gridSize = 1f;
 
     public static Data GenerateChunk(Vector3Int chunkId, MarchingCubes.ScalarField s)
