@@ -8,7 +8,7 @@ using UnityEngine;
 [RequireComponent(typeof(MeshCollider))]
 public class MeshGenerator : MonoBehaviour
 {
-    private Vector3Int chunkSize = Vector3Int.zero;
+    private Vector3Int _chunkSize = Vector3Int.zero;
 
     MarchingCubes.ScalarField generateField (Vector3Int chunkSize) {
         return (v) =>
@@ -34,9 +34,10 @@ public class MeshGenerator : MonoBehaviour
 
     private void OnDrawGizmos()
     {
-        if (chunkSize != Vector3Int.zero)
+        Debug.Log("Drawing gizmos");
+        if (_chunkSize != Vector3Int.zero)
         {
-            Gizmos.DrawWireCube(transform.position + chunkSize / 2, chunkSize);
+            Gizmos.DrawWireCube(transform.position + _chunkSize / 2, _chunkSize);
         }
     }
 
@@ -49,6 +50,8 @@ public class MeshGenerator : MonoBehaviour
     {
         var meshFilter = GetComponent<MeshFilter>();
         var meshCollider = GetComponent<MeshCollider>();
+
+        _chunkSize = chunkSize;
 
         Mesh mesh = meshFilter.sharedMesh;
         if (mesh == null) mesh = new Mesh();
