@@ -11,7 +11,7 @@ public class MapGenerator : MonoBehaviour
     private Vector3Int currentChunk;
 
     private Dictionary<Vector3Int, GameObject> chunks = new Dictionary<Vector3Int, GameObject>();
-    private Vector3Int chunkSize = new Vector3Int(20, 25, 20);
+    private static Vector3Int _chunkSize = new Vector3Int(20, 25, 20);
     
     private void Awake()
     {
@@ -51,10 +51,30 @@ public class MapGenerator : MonoBehaviour
         }
     }
 
+    private MarchingCubes.ScalarField _field = (v) =>
+    {
+        // Hard floor at 0
+        if (v.y <= Mathf.Epsilon) return 1;
+        if (v.y >= _chunkSize.y - Mathf.Epsilon) return -1;
+
+        // Soft floor
+        float heightBias = (float) Mathf.Pow(((_chunkSize.y / 2f) - v.y) / 4, 3) * 0.1f;
+
+        // Noise octaves
+        Vector3 mountains = v / 32;
+        float mountainNoise = Perlin.Noise(mountains.x, mountains.y, mountains.z) * 5;
+        Vector3 bumps = v / 12;
+        float bumpsNoise = Perlin.Noise(bumps.x, bumps.y, bumps.z) * 2;
+        Vector3 roughness = v / 3;
+        float roughNoise = Perlin.Noise(roughness.x, roughness.y, roughness.z);
+
+        return heightBias + mountainNoise + bumpsNoise + roughNoise;
+    };
+
     private Vector3Int positionToChunkIndex(Vector3 position)
     {
-        int chunkX = (int)Mathf.Floor(player.transform.position.x / chunkSize.x);
-        int chunkZ = (int)Mathf.Floor(player.transform.position.z / chunkSize.z);
+        int chunkX = (int)Mathf.Floor(player.transform.position.x / _chunkSize.x);
+        int chunkZ = (int)Mathf.Floor(player.transform.position.z / _chunkSize.z);
         return new Vector3Int(chunkX, 0, chunkZ);
     }
 
@@ -77,10 +97,10 @@ public class MapGenerator : MonoBehaviour
         GameObject chunk = new GameObject($"Chunk {chunkId.x},{chunkId.z}");
         chunks.Add(chunkId, chunk);
         chunk.transform.parent = transform;
-        chunk.transform.position = new Vector3(chunkId.x * chunkSize.x, 0, chunkId.z * chunkSize.z);
+        chunk.transform.position = new Vector3(chunkId.x * _chunkSize.x, 0, chunkId.z * _chunkSize.z);
         MeshGenerator meshGen = chunk.AddComponent<MeshGenerator>();
         chunk.GetComponent<MeshRenderer>().sharedMaterial = material;
-        meshGen.Initialize(chunkId, chunkSize);
+        meshGen.Initialize(chunkId, _chunkSize, _field);
     }
 
     private void DestroyChunk(Vector3Int chunkIndex)

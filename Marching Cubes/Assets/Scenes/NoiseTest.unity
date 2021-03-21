@@ -417,7 +417,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c74ed434c17c9f049a5ab9a68f620459, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  material: {fileID: 10302, guid: 0000000000000000f000000000000000, type: 0}
+  material: {fileID: 2100000, guid: e482d2676917f0e498a5a317f56013c0, type: 2}
+  octaves:
+  - wavelength: 12.2
+    amplitude: 14.1
+    power: 1
 --- !u!4 &1961011912
 Transform:
   m_ObjectHideFlags: 0
