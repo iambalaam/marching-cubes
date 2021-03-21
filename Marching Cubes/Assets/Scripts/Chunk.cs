@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -18,16 +19,15 @@ public class Chunk
             triangles = null;
         }
     }
-
-    public static Vector3Int chunkSize = new Vector3Int(20, 25, 20);
-    public static float gridSize = 1f;
-
-    public static Data GenerateChunk(Vector3Int chunkId, MarchingCubes.ScalarField s)
+    
+    public static Data GenerateChunk(Vector3Int chunkId, Vector3Int chunkSize, MarchingCubes.ScalarField s, float gridSize = 1)
     {
-        Data chunkData = new Data(chunkId);
+        if (gridSize != 1) throw new NotImplementedException("Non-unit gridSizing not yet implemented.");
 
-        Vector3 origin = new Vector3(chunkId.x * chunkSize.x, chunkId.y * chunkSize.y, chunkId.z * chunkSize.z);
-        List<Vector3> vertices = new List<Vector3>();
+        var chunkData = new Data(chunkId);
+
+        var origin = new Vector3(chunkId.x * chunkSize.x, chunkId.y * chunkSize.y, chunkId.z * chunkSize.z);
+        var vertices = new List<Vector3>();
 
         for (float x = 0; x < chunkSize.x; x += gridSize)
         {

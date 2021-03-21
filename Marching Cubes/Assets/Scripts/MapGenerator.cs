@@ -11,7 +11,8 @@ public class MapGenerator : MonoBehaviour
     private Vector3Int currentChunk;
 
     private Dictionary<Vector3Int, GameObject> chunks = new Dictionary<Vector3Int, GameObject>();
-
+    private Vector3Int chunkSize = new Vector3Int(20, 25, 20);
+    
     private void Awake()
     {
         player = GameObject.FindGameObjectWithTag("Player");
@@ -52,18 +53,18 @@ public class MapGenerator : MonoBehaviour
 
     private Vector3Int positionToChunkIndex(Vector3 position)
     {
-        int chunkX = (int)Mathf.Floor(player.transform.position.x / Chunk.chunkSize.x);
-        int chunkZ = (int)Mathf.Floor(player.transform.position.z / Chunk.chunkSize.z);
+        int chunkX = (int)Mathf.Floor(player.transform.position.x / chunkSize.x);
+        int chunkZ = (int)Mathf.Floor(player.transform.position.z / chunkSize.z);
         return new Vector3Int(chunkX, 0, chunkZ);
     }
 
     private IEnumerable<Vector3Int> chunksInRenderDistance()
     {
-        List<Vector3Int> chunks = new List<Vector3Int>();
+        var chunks = new List<Vector3Int>();
 
-        for (int x = currentChunk.x - 5; x <= currentChunk.x + 5; x += 1)
+        for (var x = currentChunk.x - 5; x <= currentChunk.x + 5; x += 1)
         {
-            for (int z = currentChunk.z - 5; z <= currentChunk.z + 5; z += 1)
+            for (var z = currentChunk.z - 5; z <= currentChunk.z + 5; z += 1)
             {
                 chunks.Add(new Vector3Int(x, 0, z));
             }
@@ -76,10 +77,10 @@ public class MapGenerator : MonoBehaviour
         GameObject chunk = new GameObject($"Chunk {chunkId.x},{chunkId.z}");
         chunks.Add(chunkId, chunk);
         chunk.transform.parent = transform;
-        chunk.transform.position = new Vector3(chunkId.x * Chunk.chunkSize.x, 0, chunkId.z * Chunk.chunkSize.z);
+        chunk.transform.position = new Vector3(chunkId.x * chunkSize.x, 0, chunkId.z * chunkSize.z);
         MeshGenerator meshGen = chunk.AddComponent<MeshGenerator>();
         chunk.GetComponent<MeshRenderer>().sharedMaterial = material;
-        meshGen.Initialize(chunkId);
+        meshGen.Initialize(chunkId, chunkSize);
     }
 
     private void DestroyChunk(Vector3Int chunkIndex)
