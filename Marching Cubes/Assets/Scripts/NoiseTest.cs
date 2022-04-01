@@ -40,14 +40,6 @@ public class NoiseTest : MonoBehaviour
 
     private void Start() => GenerateChunks();
 
-    private void Update()
-    {
-        foreach (var chunk in _chunks)
-        {
-            chunk.Value.Initialize(chunk.Key, _chunkSize, Field);
-        }
-    }
-
     private async void GenerateChunks()
     {
         for (int x = 0; x < 1; x++)
