@@ -15,7 +15,7 @@ public class NoiseTest : MonoBehaviour
     // Exposed in unity
     public Material material;
 
-    [Header("Octaves")] public List<Octave> octaves = new List<Octave>()
+    private List<Octave> octaves = new List<Octave>()
     {
         new Octave() {wavelength = 41.9f, amplitude = 23.5f},
         new Octave() {wavelength = 11.9f, amplitude = 15.0f},
@@ -51,9 +51,9 @@ public class NoiseTest : MonoBehaviour
 
     private void GenerateChunks()
     {
-        for (int x = 0; x < 2; x++)
+        for (int x = 0; x < 1; x++)
         {
-            for (int z = 0; z < 2; z++)
+            for (int z = 0; z < 1; z++)
             {
                 Vector3Int chunkId = new Vector3Int(x, 0, z);
                 MeshGenerator meshGen = GenerateChunk(chunkId);
@@ -69,7 +69,7 @@ public class NoiseTest : MonoBehaviour
         chunk.GetComponent<MeshRenderer>().material = material;
         chunk.transform.parent = transform;
         chunk.transform.position = new Vector3(chunkId.x * _chunkSize.x, 0, chunkId.z * _chunkSize.z);
-        meshGen.Initialize(chunkId, _chunkSize, Field);
+        meshGen.InitializeAsync(chunkId, _chunkSize, Field);
         return meshGen;
     }
 }

@@ -197,13 +197,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 472936545}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 47.21037, y: 7.4360986, z: 65.041016}
+  m_LocalRotation: {x: 0.047053277, y: -0.94066375, z: 0.14629501, w: 0.30254835}
+  m_LocalPosition: {x: 47.21037, y: 25.6, z: 65.041016}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 3
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 17.68, y: -144.341, z: 0}
 --- !u!1 &696236968
 GameObject:
   m_ObjectHideFlags: 0
@@ -418,10 +418,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   material: {fileID: 2100000, guid: e482d2676917f0e498a5a317f56013c0, type: 2}
-  octaves:
-  - wavelength: 12.2
-    amplitude: 14.1
-    power: 1
 --- !u!4 &1961011912
 Transform:
   m_ObjectHideFlags: 0

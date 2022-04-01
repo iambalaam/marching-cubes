@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
+using Stopwatch = System.Diagnostics.Stopwatch;
 using System.Linq;
 using UnityEngine;
-
 
 public class MapGenerator : MonoBehaviour
 {
@@ -31,23 +31,34 @@ public class MapGenerator : MonoBehaviour
         if (newChunk != currentChunk)
         {
             currentChunk = newChunk;
-            var previousChunks = chunks.Keys.ToArray();
-            var newChunks = chunksInRenderDistance();
-            foreach (Vector3Int chunkIndex in newChunks)
+            Debug.Log($"Creating chunk [{newChunk.x}, {newChunk.z}]");
+            UpdateChunks();
+        }
+    }
+
+    private void UpdateChunks()
+    {
+        var previousChunks = chunks.Keys.ToArray();
+        var newChunks = chunksInRenderDistance();
+
+        foreach (Vector3Int chunkIndex in newChunks)
+        {
+            // Chunk already loaded
+            if (chunks.ContainsKey(chunkIndex)) continue;
+
+            // New Chunk
+            CreateChunk(chunkIndex);
+        }
+
+        foreach (Vector3Int chunkIndex in previousChunks)
+        {
+            // Remove old chunks
+            var newChunkSet = new HashSet<Vector3Int>();
+            foreach (Vector3Int i in newChunks)
             {
-                // Chunk already loaded
-                if (chunks.ContainsKey(chunkIndex)) continue;
-
-                // New Chunk
-                CreateChunk(chunkIndex);
+                newChunkSet.Add(i);
             }
-
-            foreach(Vector3Int chunkIndex in previousChunks)
-            {
-                // Remove old chunks
-                if (!newChunks.Contains(chunkIndex)) DestroyChunk(chunkIndex);
-            }
-
+            if (!newChunkSet.Contains(chunkIndex)) DestroyChunk(chunkIndex);
         }
     }
 
@@ -82,9 +93,9 @@ public class MapGenerator : MonoBehaviour
     {
         var chunks = new List<Vector3Int>();
 
-        for (var x = currentChunk.x - 5; x <= currentChunk.x + 5; x += 1)
+        for (var x = currentChunk.x - 4; x <= currentChunk.x + 4; x += 1)
         {
-            for (var z = currentChunk.z - 5; z <= currentChunk.z + 5; z += 1)
+            for (var z = currentChunk.z - 4; z <= currentChunk.z + 4; z += 1)
             {
                 chunks.Add(new Vector3Int(x, 0, z));
             }
@@ -92,15 +103,21 @@ public class MapGenerator : MonoBehaviour
         return chunks;
     }
 
-    private void CreateChunk(Vector3Int chunkId)
+    private async void CreateChunk(Vector3Int chunkId)
     {
+        // perf matters
+        Stopwatch stopwatch = Stopwatch.StartNew();
+
         GameObject chunk = new GameObject($"Chunk {chunkId.x},{chunkId.z}");
         chunks.Add(chunkId, chunk);
         chunk.transform.parent = transform;
         chunk.transform.position = new Vector3(chunkId.x * _chunkSize.x, 0, chunkId.z * _chunkSize.z);
         MeshGenerator meshGen = chunk.AddComponent<MeshGenerator>();
         chunk.GetComponent<MeshRenderer>().sharedMaterial = material;
-        meshGen.Initialize(chunkId, _chunkSize, _field);
+        await meshGen.InitializeAsync(chunkId, _chunkSize, _field);
+
+        stopwatch.Stop();
+        Debug.Log($"Created chunk [{chunkId.x}, {chunkId.z}] ({stopwatch.ElapsedMilliseconds}ms)");
     }
 
     private void DestroyChunk(Vector3Int chunkIndex)
