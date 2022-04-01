@@ -112,7 +112,7 @@ public class MapGenerator : MonoBehaviour
         chunks.Add(chunkId, chunk);
         chunk.transform.parent = transform;
         chunk.transform.position = new Vector3(chunkId.x * _chunkSize.x, 0, chunkId.z * _chunkSize.z);
-        MeshGenerator meshGen = chunk.AddComponent<MeshGenerator>();
+        Chunk meshGen = chunk.AddComponent<Chunk>();
         chunk.GetComponent<MeshRenderer>().sharedMaterial = material;
         await meshGen.InitializeAsync(chunkId, _chunkSize, _field);
 

@@ -1,7 +1,6 @@
 ﻿using NUnit.Framework;
 using System;
 using UnityEngine;
-using UnityEngine.Rendering;
 
 namespace Tests
 {

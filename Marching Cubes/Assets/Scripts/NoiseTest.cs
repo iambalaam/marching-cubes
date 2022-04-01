@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections;
+﻿using System.Threading.Tasks;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -24,7 +23,7 @@ public class NoiseTest : MonoBehaviour
 
     // Members
     private Vector3Int _chunkSize = new Vector3Int(40, 30, 40);
-    private Dictionary<Vector3Int, MeshGenerator> _chunks = new Dictionary<Vector3Int, MeshGenerator>();
+    private Dictionary<Vector3Int, Chunk> _chunks = new Dictionary<Vector3Int, Chunk>();
 
 
     private float Field(Vector3 v)
@@ -49,27 +48,27 @@ public class NoiseTest : MonoBehaviour
         }
     }
 
-    private void GenerateChunks()
+    private async void GenerateChunks()
     {
         for (int x = 0; x < 1; x++)
         {
             for (int z = 0; z < 1; z++)
             {
                 Vector3Int chunkId = new Vector3Int(x, 0, z);
-                MeshGenerator meshGen = GenerateChunk(chunkId);
+                Chunk meshGen = await GenerateChunk(chunkId);
                 _chunks.Add(chunkId, meshGen);
             }
         }
     }
 
-    private MeshGenerator GenerateChunk(Vector3Int chunkId)
+    private async Task<Chunk> GenerateChunk(Vector3Int chunkId)
     {
         var chunk = new GameObject($"Chunk [{chunkId.x},{chunkId.z}]");
-        var meshGen = chunk.AddComponent<MeshGenerator>();
+        var meshGen = chunk.AddComponent<Chunk>();
         chunk.GetComponent<MeshRenderer>().material = material;
         chunk.transform.parent = transform;
         chunk.transform.position = new Vector3(chunkId.x * _chunkSize.x, 0, chunkId.z * _chunkSize.z);
-        meshGen.InitializeAsync(chunkId, _chunkSize, Field);
+        await meshGen.InitializeAsync(chunkId, _chunkSize, Field);
         return meshGen;
     }
 }

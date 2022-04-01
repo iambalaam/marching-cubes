@@ -1,116 +1,83 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Collections;
+using System.Threading.Tasks;
 using UnityEngine;
 
-public class Chunk
+[RequireComponent(typeof(MeshFilter))]
+[RequireComponent(typeof(MeshRenderer))]
+// [RequireComponent(typeof(MeshCollider))]
+public class Chunk : MonoBehaviour
 {
-    public struct Data
-    {
-        public Vector3Int chunkId;
-        public Vector3[] vertices;
-        public Color[] colors;
-        public int[] triangles;
+    private Vector3Int _chunkSize = Vector3Int.zero;
 
-        public Data(Vector3Int id) {
-            chunkId = id;
-            vertices = null;
-            colors = null;
-            triangles = null;
+    private void OnDrawGizmos()
+    {
+        if (_chunkSize != Vector3Int.zero)
+        {
+            Gizmos.DrawWireCube(transform.position + _chunkSize / 2, _chunkSize);
         }
     }
 
-    private static float[][][] SampleScalarField(Vector3Int chunkId, Vector3Int chunkSize, MarchingCubes.ScalarField s)
+    public void Initialize(Vector3Int chunkId, Vector3Int chunkSize, MarchingCubes.ScalarField field)
     {
-        Vector3 origin = new Vector3(chunkId.x * chunkSize.x, chunkId.y * chunkSize.y, chunkId.z * chunkSize.z);
-        float[][][] data = new float[(chunkSize.x + 1)][][];
-        for (int x = 0; x <= chunkSize.x; x++)
-        {
-            data[x] = new float[(chunkSize.y + 1)][];
-            for (int y = 0; y <= chunkSize.y; y++)
-            {
-                data[x][y] = new float[(chunkSize.z + 1)];
-                for (int z = 0; z <= chunkSize.z; z++)
-                {
-                    data[x][y][z] = s(origin + new Vector3(x, y, z));
-                }
-            }
-        }
-
-        return data;
+        GenerateChunk(chunkId, chunkSize, field);
     }
 
-    public static Data GenerateChunk(Vector3Int chunkId, Vector3Int chunkSize, MarchingCubes.ScalarField s, int gridSize = 1)
+    private void GenerateChunk(Vector3Int chunkId, Vector3Int chunkSize, MarchingCubes.ScalarField field)
     {
-        if (gridSize != 1) throw new NotImplementedException("Non-unit gridSizing not yet implemented.");
+        var meshFilter = GetComponent<MeshFilter>();
+        // var meshCollider = GetComponent<MeshCollider>();
 
-        var chunkData = new Data(chunkId);
-        var chunkValues = SampleScalarField(chunkId, chunkSize, s);
+        _chunkSize = chunkSize;
 
-        var vertices = new List<Vector3>();
+        Mesh mesh = meshFilter.sharedMesh;
+        if (mesh == null) mesh = new Mesh();
+        mesh.name = $"Chunk Mesh: [{chunkId.x},{chunkId.z}]";
 
-        for (int x = 0; x < chunkSize.x; x += gridSize)
-        {
-            for (int y = 0; y < chunkSize.y; y += gridSize)
-            {
-                for (int z = 0; z < chunkSize.z; z += gridSize)
-                {
-                    Vector3[] tris =
-                        MarchingCubes.TriangulateCube(new Vector3(x, y, z), (v) => chunkValues[(int)v.x][(int)v.y][(int)v.z]);
-                    vertices.AddRange(tris);
-                }
-            }
-        }
+        ChunkData.Data data = new ChunkData.Data(chunkId);
 
-        // Separate this later as another delegate
-        Color[] colors = new Color[vertices.Count];
+        data = ChunkData.GenerateChunkData(chunkId, chunkSize, field);
 
-        for (int i = 0; i < vertices.Count; i++)
-        {
-            colors[i] = Color.Lerp(Color.blue, Color.red, (vertices[i].y / 10f));
-        }
+        mesh.Clear();
+        mesh.vertices = data.vertices;
+        mesh.colors = data.colors;
+        mesh.triangles = data.triangles;
+        mesh.RecalculateNormals();
 
-        chunkData.vertices = vertices.ToArray();
-        chunkData.colors = colors;
-        chunkData.triangles = Enumerable.Range(0, vertices.Count).ToArray();
-
-        return chunkData;
+        meshFilter.sharedMesh = mesh;
+        //meshCollider.sharedMesh = mesh;
     }
 
-    public static Data GenerateChunkOld(Vector3Int chunkId, Vector3Int chunkSize, MarchingCubes.ScalarField s, int gridSize = 1)
+    public async Task<bool> InitializeAsync(Vector3Int chunkId, Vector3Int chunkSize, MarchingCubes.ScalarField field)
     {
-        if (gridSize != 1) throw new NotImplementedException("Non-unit gridSizing not yet implemented.");
+        return await GenerateAsyncChunk(chunkId, chunkSize, field);
+    }
 
-        var chunkData = new Data(chunkId);
 
-        var vertices = new List<Vector3>();
+    async Task<bool> GenerateAsyncChunk(Vector3Int chunkId, Vector3Int chunkSize, MarchingCubes.ScalarField field)
+    {
+        var meshFilter = GetComponent<MeshFilter>();
+        //var meshCollider = GetComponent<MeshCollider>();
 
-        for (int x = 0; x < chunkSize.x; x += gridSize)
-        {
-            for (int y = 0; y < chunkSize.y; y += gridSize)
-            {
-                for (int z = 0; z < chunkSize.z; z += gridSize)
-                {
-                    Vector3[] tris =
-                        MarchingCubes.TriangulateCube(new Vector3(x, y, z), s);
-                    vertices.AddRange(tris);
-                }
-            }
-        }
+        _chunkSize = chunkSize;
 
-        // Separate this later as another delegate
-        Color[] colors = new Color[vertices.Count];
+        Mesh mesh = meshFilter.sharedMesh;
+        if (mesh == null) mesh = new Mesh();
+        mesh.name = $"Chunk Mesh: [{chunkId.x},{chunkId.z}]";
 
-        for (int i = 0; i < vertices.Count; i++)
-        {
-            colors[i] = Color.Lerp(Color.blue, Color.red, (vertices[i].y / 10f));
-        }
+        ChunkData.Data data = new ChunkData.Data(chunkId);
+        data = await Task.Run(() => { return ChunkData.GenerateChunkData(chunkId, chunkSize, field); });
+        
+        mesh.Clear();
+        mesh.vertices = data.vertices;
+        mesh.colors = data.colors;
+        mesh.triangles = data.triangles;
+        mesh.RecalculateNormals();
 
-        chunkData.vertices = vertices.ToArray();
-        chunkData.colors = colors;
-        chunkData.triangles = Enumerable.Range(0, vertices.Count).ToArray();
+        meshFilter.sharedMesh = mesh;
+        //meshCollider.sharedMesh = mesh;
 
-        return chunkData;
+        return true;
     }
 
 }
